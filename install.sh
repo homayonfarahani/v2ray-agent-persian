@@ -1,32 +1,32 @@
 #!/usr/bin/env bash
-# 检测区
+# منطقه تشخیص
 # -------------------------------------------------------------
-# 检查系统
+# چک کردن سیستم
 export LANG=en_US.UTF-8
 
 echoContent() {
 	case $1 in
-	# 红色
+	# قرمز
 	"red")
 		# shellcheck disable=SC2154
 		${echoType} "\033[31m${printN}$2 \033[0m"
 		;;
-		# 天蓝色
+		# آبی آسمانی
 	"skyBlue")
 		${echoType} "\033[1;36m${printN}$2 \033[0m"
 		;;
-		# 绿色
+		# سبز
 	"green")
 		${echoType} "\033[32m${printN}$2 \033[0m"
 		;;
-		# 白色
+		# سفید
 	"white")
 		${echoType} "\033[37m${printN}$2 \033[0m"
 		;;
 	"magenta")
 		${echoType} "\033[31m${printN}$2 \033[0m"
 		;;
-		# 黄色
+		# رنگ زرد
 	"yellow")
 		${echoType} "\033[33m${printN}$2 \033[0m"
 		;;
@@ -68,14 +68,14 @@ checkSystem() {
 	fi
 
 	if [[ -z ${release} ]]; then
-		echoContent red "\n本脚本不支持此系统，请将下方日志反馈给开发者\n"
+		echoContent red "\nاین اسکریپت از این سیستم پشتیبانی نمی‌کند، لطفاً گزارش زیر را به توسعه‌دهنده بازخورد دهید\n"
 		echoContent yellow "$(cat /etc/issue)"
 		echoContent yellow "$(cat /proc/version)"
 		exit 0
 	fi
 }
 
-# 检查CPU提供商
+# ارائه دهنده CPU را بررسی کنید
 checkCPUVendor() {
 	if [[ -n $(which uname) ]]; then
 		if [[ "$(uname)" == "Linux" ]]; then
@@ -91,84 +91,84 @@ checkCPUVendor() {
 				hysteriaCoreCPUVendor="hysteria-linux-arm64"
 				;;
 			*)
-				echo "  不支持此CPU架构--->"
+				echo "  این معماری CPU پشتیبانی نمی شود--->"
 				exit 1
 				;;
 			esac
 		fi
 	else
-		echoContent red "  无法识别此CPU架构，默认amd64、x86_64--->"
+		echoContent red "  قادر به تشخیص این معماری CPU، پیش فرض نیستamd64、x86_64--->"
 		xrayCoreCPUVendor="Xray-linux-64"
 		v2rayCoreCPUVendor="v2ray-linux-64"
 	fi
 }
 
-# 初始化全局变量
+# مقداردهی اولیه متغیرهای سراسری
 initVar() {
 	installType='yum -y install'
 	removeType='yum -y remove'
 	upgrade="yum -y update"
 	echoType='echo -e'
 
-	# 核心支持的cpu版本
+	# نسخه cpu پشتیبانی شده از هسته
 	xrayCoreCPUVendor=""
 	v2rayCoreCPUVendor=""
 	hysteriaCoreCPUVendor=""
 
-	# 域名
+	# نام دامنه
 	domain=
 
-	# CDN节点的address
+	# CDN گره address
 	add=
 
-	# 安装总进度
+	# پیشرفت کلی نصب
 	totalProgress=1
 
-	# 1.xray-core安装
-	# 2.v2ray-core 安装
-	# 3.xray-core预览版安装
+	# 1.xray-core نصب کردن
+	# 2.v2ray-core نصب کردن
+	# 3.xray-core پیش نمایش نصب
 	coreInstallType=
 
-	# 核心安装path
+	# مسیر نصب هسته
 	# coreInstallPath=
 
 	# v2ctl Path
 	ctlPath=
-	# 1.全部安装
-	# 2.个性化安装
+	# 1.همه را نصب کنید
+	# 2.نصب شخصی
 	# v2rayAgentInstallType=
 
-	# 当前的个性化安装方式 01234
+	# روش نصب شخصی سازی فعلی 01234
 	currentInstallProtocolType=
 
-	# 当前alpn的顺序
+	#ترتیب alpn فعلی
 	currentAlpn=
 
-	# 前置类型
+	# نوع جلو
 	frontingType=
 
-	# 选择的个性化安装方式
+	# روش نصب شخصی انتخاب شده
 	selectCustomInstallType=
 
-	# v2ray-core、xray-core配置文件的路径
+	# v2ray-core、xray-core مسیر فایل پیکربندی
 	configPath=
 
-	# hysteria 配置文件的路径
+	# hysteria مسیر فایل پیکربندی
 	hysteriaConfigPath=
 
-	# 配置文件的path
+	# مسیر فایل پیکربندی
 	currentPath=
 
-	# 配置文件的host
+	#  فایل پیکربندی host
 	currentHost=
 
-	# 安装时选择的core类型
+	# نوع هسته انتخاب شده در هنگام نصب
 	selectCoreType=
 
-	# 默认core版本
+	# نسخه اصلی پیش فرض
 	v2rayCoreVersion=
 
-	# 随机路径
+	# مسیر تصادفی
 	customPath=
 
 	# centos version
@@ -182,34 +182,34 @@ initVar() {
 
 	localIP=
 
-	# 集成更新证书逻辑不再使用单独的脚本--RenewTLS
+	# منطق گواهی به روز رسانی یکپارچه دیگر از یک اسکریپت جداگانه استفاده نمی کند--RenewTLS
 	renewTLS=$1
 
-	# tls安装失败后尝试的次数
+	# tls تعداد تلاش‌ها پس از نصب ناموفق
 	installTLSCount=
 
-	# BTPanel状态
+	# BTPanelحالت 
 	#	BTPanelStatus=
 
-	# nginx配置文件路径
+	# nginx مسیر فایل پیکربندی
 	nginxConfigPath=/etc/nginx/conf.d/
 
-	# 是否为预览版
+	# آیا نسخه پیش نمایش است؟
 	prereleaseStatus=false
 
-	# xtls是否使用vision
+	# xtls استفاده کنید یا نه vision
 	xtlsRprxVision=
 
-	# ssl类型
+	# ssl انواع
 	sslType=
 
-	# ssl邮箱
+	# ssl ایمیل 
 	sslEmail=
 
-	# 检查天数
+	# دوره بررسی گواهی
 	sslRenewalDays=90
 
-	# dns ssl状态
+	# dns ssl حالت
 	dnsSSLStatus=
 
 	# dns tls domain
